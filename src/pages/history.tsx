@@ -15,6 +15,8 @@ import Navbar from "../components/navbar"
 import { api } from "~/utils/api"
 import { toast } from "react-hot-toast"
 import { LoadingSpinner } from "~/components/loading"
+import IconCard from "~/components/IconCard"
+import { Button } from "~/components/ui/button"
 
 dayjs.extend(relativeTime)
 
@@ -97,65 +99,44 @@ const ImageView = (image: Image) => {
   })
   return (
     <>
-      <div className="mb-1 flex h-auto flex-col items-center justify-center gap-4 rounded-lg border-2 border-slate-300 bg-slate-50 p-4 shadow-lg shadow-slate-400 sm:flex-row">
-        <Image
-          width={1024}
-          height={1024}
-          className="xs:h-64 xs:w-64 s:h-72 s:w-72 ss:h-80 ss:w-80 h-52 w-52 shadow-lg shadow-slate-500 duration-200 ease-in hover:cursor-pointer hover:shadow-violet-700"
-          src={image.url}
-          alt="Generated image"
-          quality={100}
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCA"
-          onClick={() => setImageModalOpen(true)}
-        />
-        <div className="ml:px-8 flex w-full flex-col items-start md:px-2">
-          <div className="flex gap-1 font-bold text-slate-300">
-            <span className="font-thin text-black">{`Generated ${dayjs(
-              image.createdAt
-            ).fromNow()}`}</span>
-          </div>
-          <span className="flex max-h-64 flex-wrap overflow-auto pb-4 pr-2 font-serif text-xl">
-            {image.prompt}
-          </span>
-          <div className="ml:gap-3 flex h-fit content-end items-end justify-start gap-1 pt-1 align-bottom">
-            <Link
-              href={image.url}
-              className="text-md flex h-9 items-center justify-center rounded-xl border-b-4 border-violet-900
-                bg-violet-600 px-4 font-medium text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
-            >
-              Download
-            </Link>
-            <button
-              className="text-md flex h-9 items-center justify-center rounded-xl border-b-4 border-violet-900
-                bg-violet-600 px-4 font-medium text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
-              onClick={() => setDeleteModalOpen(true)}
-            >
-              Delete
-            </button>
-            {image.hidden && (
-              <button
-                className="text-md flex h-9 items-center justify-center rounded-xl border-b-4 border-violet-900
-                  bg-violet-600 px-4 font-medium text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
-                onClick={() => mutateShow({ id: image.id })}
-              >
-                <span className="flex lg:hidden">Show</span>
-                <span className="hidden lg:flex">Show on front page</span>
-              </button>
-            )}
-            {!image.hidden && (
-              <button
-                className="text-md flex h-9 items-center justify-center rounded-xl border-b-4 border-violet-900
-                  bg-violet-600 px-4 font-medium text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
-                onClick={() => mutateHide({ id: image.id })}
-              >
-                <span className="flex lg:hidden">Hide</span>
-                <span className="hidden lg:flex">Hide on front page</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      <IconCard
+        image={image.url}
+        title={image.prompt}
+        subTitle={`Generated ${dayjs(image.createdAt).fromNow()}`}
+        buttons={[
+          {
+            text: "View",
+            onClick: () => {
+              setImageModalOpen(true)
+            },
+          },
+          {
+            text: "Download",
+            href: image.url,
+          },
+          {
+            text: "Delete",
+            onClick: () => {
+              setDeleteModalOpen(true)
+            },
+          },
+          {
+            text: "Show on front page",
+            hide: !image.hidden,
+            onClick: () => {
+              mutateShow({ id: image.id })
+            },
+          },
+          {
+            text: "Hide on front page",
+            hide: image.hidden,
+            onClick: () => {
+              mutateHide({ id: image.id })
+            },
+          },
+        ]}
+        trucateWords={90}
+      />
       <Transition appear show={deleteModalOpen} as={Fragment}>
         <Dialog
           as="div"
@@ -295,36 +276,19 @@ const Feed = () => {
 
   return (
     <div className="mx-auto flex min-h-screen w-11/12 max-w-screen-xl flex-col content-center justify-center gap-2 md:w-5/6">
-      <p className="pt-4 text-center text-2xl font-semibold sm:text-3xl md:text-4xl">
-        You have{" "}
-        <span className="text-violet-600">{data ? data.length : 0}</span>{" "}
-        generated images
-      </p>
-      <div className="flex items-center justify-center py-4">
-        <Link
-          href="/generate"
-          className="flex items-center justify-center rounded-xl border-b-4 border-violet-900 bg-violet-600
-          px-2 py-1 text-lg font-semibold text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
-        >
-          Generate a new image
-        </Link>
+      <div className="flex items-center justify-between py-4">
+        <p className="text-center text-2xl font-semibold sm:text-3xl md:text-4xl">
+          Your Collection
+        </p>
+        <Button size="sm" variant="outline">
+          <Link href="/generate">Generate a new image</Link>
+        </Button>
       </div>
       {!!data.length && (
-        <>
+        <div className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-2 md:grid-cols-3">
           {data?.map((fullImage) => (
             <ImageView {...fullImage} key={fullImage.id} />
           ))}
-        </>
-      )}
-      {!!data.length && data.length >= 3 && (
-        <div className="flex items-center justify-center py-4">
-          <Link
-            href="/generate"
-            className="flex items-center justify-center rounded-xl border-b-4 border-violet-900 bg-violet-600
-          px-2 py-1 text-lg font-semibold text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
-          >
-            Generate new images
-          </Link>
         </div>
       )}
     </div>
@@ -342,7 +306,7 @@ const HistoryPage: NextPage = () => {
       </Head>
       <main className="flex flex-col justify-center text-black">
         <Navbar />
-        <div className="border-x border-slate-400 pt-36 text-black sm:pt-24">
+        <div className="pt-10">
           <Feed />
         </div>
       </main>

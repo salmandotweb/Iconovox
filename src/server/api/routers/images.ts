@@ -73,22 +73,16 @@ export const imagesRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const authorId = ctx.userId
-      const prompt = input.prompt
-      // For testing purposes (return latest generated image)
-      //   const image = await ctx.prisma.image.findFirst({
-      //     take: 1,
-      //     orderBy: [
-      //       {createdAt: "desc"}
-      //     ]
-      //   })
-      //   return image
-      // }),
+      // remove icon word from the prompt both lowercase and uppercase
+      const prompt = input.prompt.replace("icon", "").replace("Icon", "")
 
-      const image = await ctx.prisma.image.findFirst({
-        take: 1,
-        orderBy: [{ createdAt: "desc" }],
-      })
-      return image
+      // For testing purposes (return latest generated image)
+      // const image = await ctx.prisma.image.findFirst({
+      //   take: 1,
+      //   orderBy: [{ createdAt: "desc" }],
+      // })
+      // return image
+      // }),
 
       // Check if user has a positive token balance
       const stripeUser = await ctx.prisma.stripeUser.findFirst({
@@ -129,12 +123,14 @@ export const imagesRouter = createTRPCRouter({
         })
       }
 
+      const customPrompt = `${prompt} icon`
+
       try {
         // Make call to DALL-E
         const dalleResponse: DalleResponse = await axios.post(
           "https://api.openai.com/v1/images/generations",
           {
-            prompt: prompt,
+            prompt: customPrompt,
             n: 1,
             size: "1024x1024",
           },

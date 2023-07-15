@@ -6,7 +6,13 @@ import { api } from "~/utils/api"
 import { useRouter } from "next/router"
 import { LoadingSpinner } from "./loading"
 
-const navigation = [{ title: "Generate", path: "/generate" }]
+const navigation = [
+  { title: "Generate", path: "/generate" },
+  {
+    title: "My Collection",
+    path: "/history",
+  },
+]
 
 const Navbar: React.FC = () => {
   const { isSignedIn } = useUser()

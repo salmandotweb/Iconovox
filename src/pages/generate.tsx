@@ -22,6 +22,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "~/components/ui/hover-card"
+import IconCard from "~/components/IconCard"
 
 dayjs.extend(relativeTime)
 
@@ -150,12 +151,10 @@ const CreateImageWizard = () => {
     },
     onError: (e) => {
       // TRPC Error
-      console.log(e)
       if (e.message) {
         toast.error(e.message)
       } else {
         // Zod Error
-        console.log(e.data?.zodError)
         const errorMessage = e.data?.zodError?.fieldErrors.prompt
         if (errorMessage && errorMessage[0]) {
           toast.error(errorMessage[0])
@@ -187,83 +186,43 @@ const CreateImageWizard = () => {
       <div className="h-full">
         {createdImage && (
           <>
-            <Card
-              style={{
-                overflow: "hidden",
-                maxWidth: "400px",
-                margin: "10px auto 0 auto",
-              }}
-            >
-              <CardHeader
-                style={{
-                  padding: 0,
-                  width: "100%",
-                  height: "250px",
-                }}
-              >
-                <Image
-                  src={createdImage.url}
-                  fill
-                  alt={createdImage.prompt}
-                  style={{
-                    objectFit: "cover",
-                  }}
-                />
-              </CardHeader>
-              <CardContent
-                style={{
-                  margin: "1rem 0",
-                  padding: "0 1rem",
-                }}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <CardTitle>{createdImage.prompt.toUpperCase()}</CardTitle>
-                  <span className="text-xs">{`Generated ${dayjs(
-                    createdImage.createdAt
-                  ).fromNow()}`}</span>
-                </div>
-
-                <div className="mt-5 flex h-fit content-end items-end justify-start gap-1 align-bottom">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setImageModalOpen(true)}
-                  >
-                    View
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Link href={createdImage.url}>Download</Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDeleteModalOpen(true)}
-                  >
-                    Delete
-                  </Button>
-                  {createdImage.hidden && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => mutateShow({ id: createdImage.id })}
-                    >
-                      <span className="flex lg:hidden">Show</span>
-                      <span className="hidden lg:flex">Show on front page</span>
-                    </Button>
-                  )}
-                  {!createdImage.hidden && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => mutateHide({ id: createdImage.id })}
-                    >
-                      <span className="flex lg:hidden">Hide</span>
-                      <span className="hidden lg:flex">Hide on front page</span>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <IconCard
+              image={createdImage.url}
+              title={createdImage.prompt}
+              subTitle={`Generated ${dayjs(createdImage.createdAt).fromNow()}`}
+              buttons={[
+                {
+                  text: "View",
+                  onClick: () => {
+                    setImageModalOpen(true)
+                  },
+                },
+                {
+                  text: "Download",
+                  href: createdImage.url,
+                },
+                {
+                  text: "Delete",
+                  onClick: () => {
+                    setDeleteModalOpen(true)
+                  },
+                },
+                {
+                  text: "Show on front page",
+                  hide: !createdImage.hidden,
+                  onClick: () => {
+                    mutateShow({ id: createdImage.id })
+                  },
+                },
+                {
+                  text: "Hide on front page",
+                  hide: createdImage.hidden,
+                  onClick: () => {
+                    mutateHide({ id: createdImage.id })
+                  },
+                },
+              ]}
+            />
             <Transition appear show={deleteModalOpen} as={Fragment}>
               <Dialog
                 as="div"
@@ -412,7 +371,7 @@ const Generate: NextPage = () => {
       </Head>
       <main className="justify-center">
         <Navbar />
-        <div className="pt-20">
+        <div className="pt-10">
           <CreateImageWizard />
         </div>
       </main>
