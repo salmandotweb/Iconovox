@@ -79,7 +79,13 @@ const IconCard: FC<IconCardProps> = (props: IconCardProps) => {
               !button.hide && (
                 <Button
                   key={index}
-                  onClick={button.href ? () => {} : button.onClick}
+                  onClick={
+                    button.href
+                      ? () => {
+                          null
+                        }
+                      : button.onClick
+                  }
                   variant="outline"
                   size="sm"
                   className="cursor-pointer"
