@@ -6,18 +6,17 @@ import { api } from "~/utils/api"
 import { useRouter } from "next/router"
 import { LoadingSpinner } from "./loading"
 
-const navigation = [
-  { title: "Generate", path: "/generate" },
-  {
-    title: "My Collection",
-    path: "/history",
-  },
-]
-
 const Navbar: React.FC = () => {
   const { isSignedIn } = useUser()
 
-  const router = useRouter()
+  const navigation = [
+    { title: "Generate", path: "/generate" },
+    {
+      title: "My Collection",
+      path: "/history",
+      hide: !isSignedIn,
+    },
+  ]
 
   const { mutateAsync: createCheckout } =
     api.checkout.createCheckout.useMutation()
@@ -47,12 +46,7 @@ const Navbar: React.FC = () => {
         <div className="mx-auto max-w-screen-xl items-center gap-x-14 px-4 md:flex md:px-8">
           <div className="flex items-center justify-between py-5 md:block">
             <Link href="/">
-              <img
-                src="https://www.floatui.com/logo.svg"
-                width={120}
-                height={50}
-                alt="Float UI logo"
-              />
+              <h2 className="text-2xl font-bold text-gray-800">Imagen.</h2>
             </Link>
             <div className="md:hidden">
               <button className="menu-btn text-gray-500 hover:text-gray-800">
@@ -97,9 +91,11 @@ const Navbar: React.FC = () => {
               {navigation.map((item, idx) => {
                 return (
                   <li key={idx} className="text-gray-700 hover:text-gray-900">
-                    <a href={item.path} className="block">
-                      {item.title}
-                    </a>
+                    {!item.hide && (
+                      <a href={item.path} className="block">
+                        {item.title}
+                      </a>
+                    )}
                   </li>
                 )
               })}
