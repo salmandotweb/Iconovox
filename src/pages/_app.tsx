@@ -9,7 +9,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <ClerkProvider>
       <Head>
-        <title>Imager</title>
+        <title>imagen</title>
         <meta
           name="description"
           content="Bring your imagination to life with our AI-generated images"

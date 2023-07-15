@@ -18,7 +18,7 @@ type DalleResponse = {
   }
 }
 
-type ImageResponse = {
+type imagenesponse = {
   data: Buffer
 }
 
@@ -84,13 +84,19 @@ export const imagesRouter = createTRPCRouter({
       //   return image
       // }),
 
+      const image = await ctx.prisma.image.findFirst({
+        take: 1,
+        orderBy: [{ createdAt: "desc" }],
+      })
+      return image
+
       // Check if user has a positive token balance
       const stripeUser = await ctx.prisma.stripeUser.findFirst({
         where: {
           clerkID: ctx.userId,
         },
       })
-      if (!stripeUser || !stripeUser.credits || stripeUser?.credits <= 0) {
+      if (!stripeUser || !stripeUser?.credits || stripeUser?.credits <= 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message:
@@ -140,11 +146,11 @@ export const imagesRouter = createTRPCRouter({
           }
         )
         const imageUrl = dalleResponse["data"]["data"][0]["url"]
-        const imageResponse: ImageResponse = await axios.get(imageUrl, {
+        const imagenesponse: imagenesponse = await axios.get(imageUrl, {
           responseType: "arraybuffer",
         })
 
-        if (!imageResponse) {
+        if (!imagenesponse) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Error downloading image from DALL-E",
@@ -160,7 +166,7 @@ export const imagesRouter = createTRPCRouter({
         await uploadImage({
           Bucket: "salmandotweb-icony",
           Key: s3Key,
-          Body: imageResponse.data,
+          Body: imagenesponse.data,
         })
         const s3Url = `https://salmandotweb-icony.s3.amazonaws.com/${s3Key}`
 

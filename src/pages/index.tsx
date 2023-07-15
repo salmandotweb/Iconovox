@@ -10,7 +10,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Imager</title>
+        <title>imagen</title>
       </Head>
       <main>
         <Navbar />

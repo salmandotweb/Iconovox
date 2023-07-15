@@ -338,7 +338,7 @@ const HistoryPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Imager</title>
+        <title>imagen</title>
       </Head>
       <main className="flex flex-col justify-center text-black">
         <Navbar />

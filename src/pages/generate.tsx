@@ -14,6 +14,14 @@ import { toast } from "react-hot-toast"
 import Navbar from "~/components/navbar"
 import type { Image as PrismaImage } from "@prisma/client"
 import coin from "../../public/coin.png"
+import { Input } from "~/components/ui/input"
+import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "~/components/ui/hover-card"
 
 dayjs.extend(relativeTime)
 
@@ -159,155 +167,103 @@ const CreateImageWizard = () => {
   })
 
   return (
-    <div className="mx-auto flex min-h-screen w-11/12 max-w-screen-xl flex-col content-center justify-center gap-2 md:w-5/6">
-      <p className="text-center text-2xl font-semibold sm:text-3xl md:text-4xl">
-        Generate an image
-      </p>
-      <div className="py-4 pb-4 font-medium text-black">
-        <p className="pb-1 text-xl font-semibold">Instructions for best use:</p>
-        <ul className="list-decimal pl-8">
-          <li>Be as detailed as possible.</li>
-          <li>
-            Mention the style of image you want, such as cartoon, painting,
-            photo, 3d render, Unreal Engine, 8k, etc.
-          </li>
-          <li>
-            Be specific about the individual elements, background, and colors
-            you want in your image.
-          </li>
-          <li>
-            Try to avoid overly complicated/specific prompts and images with
-            multiple human subjects, as they may lead to distortions.
-          </li>
-          <li>
-            Note: Some long/complex prompts cause an error by taking over 10
-            seconds to generate, leading to an API timeout. If this happens,
-            please try again with a different prompt while we work on a fix.
-          </li>
-        </ul>
+    <div className="mx-auto flex w-11/12 max-w-screen-xl flex-col content-center justify-center gap-2 md:w-5/6">
+      <div className="mx-auto flex w-full max-w-sm items-center space-x-2">
+        <Input
+          type="text"
+          placeholder="Software engineer in gamers room"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <Button
+          type="submit"
+          onClick={() => createMutate({ prompt: input })}
+          disabled={isGenerating || !input}
+        >
+          Generate
+        </Button>
       </div>
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-row gap-2 text-sm">
-          <p className="flex items-center justify-center font-medium">
-            Want a sample prompt?
-          </p>
-          <button
-            onClick={() => {
-              // Set the input to the suggested prompt and refetch for the next button press
-              if (suggestedPrompt && !isLoading) {
-                setInput(suggestedPrompt.text)
-                void refetch()
-              }
-            }}
-            className="border-b-3 flex items-center justify-center rounded-lg border-violet-900
-            bg-violet-600 px-2 py-1 font-semibold text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
-          >
-            Surprise me
-          </button>
-        </div>
-        <div className="flex w-full flex-col rounded-lg border-2 border-slate-300 bg-slate-50 font-semibold text-black shadow-lg shadow-slate-400 sm:flex-row">
-          <textarea
-            rows={5}
-            placeholder="Enter a prompt!"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isGenerating}
-            className="flex w-full rounded-lg bg-slate-50 pl-2 pt-2 sm:hidden"
-          ></textarea>
-          <textarea
-            rows={3}
-            placeholder="Enter a prompt!"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isGenerating}
-            className="hidden w-full rounded-lg bg-slate-50 pl-2 pt-2 sm:flex"
-          ></textarea>
-          {!isGenerating ? (
-            <div className="border-t-1 sm:border-l-1 flex flex-row items-center justify-center gap-1.5 border-slate-300 p-2 sm:w-32 sm:border-t-0">
-              <button
-                className="rounded-lg duration-300 ease-in hover:text-violet-600 disabled:bg-slate-50 disabled:text-slate-300"
-                onClick={() => createMutate({ prompt: input })}
-                disabled={isGenerating || input === ""}
-              >
-                Generate
-              </button>
-              <Image
-                className=""
-                src={coin}
-                alt="credits"
-                width={22}
-                height={22}
-              />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center border-l-2 sm:w-32">
-              <LoadingSpinner />
-            </div>
-          )}
-        </div>
-      </div>
+
       <div className="h-full">
         {createdImage && (
           <>
-            <div className="mt-4 flex h-auto flex-col items-center justify-center gap-4 rounded-lg border-2 border-slate-300 bg-slate-50 p-4 shadow-xl shadow-slate-400 sm:flex-row">
-              <Image
-                width={1024}
-                height={1024}
-                className="xs:h-64 xs:w-64 s:h-72 s:w-72 ss:h-80 ss:w-80 h-52 w-52 shadow-lg shadow-slate-500 duration-200 ease-in hover:cursor-pointer hover:shadow-violet-700"
-                src={createdImage.url}
-                alt="Generated image"
-                quality={100}
-                placeholder="blur"
-                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCA"
-                onClick={() => setImageModalOpen(true)}
-              />
-              <div className="ml:px-8 flex w-full flex-col items-start md:px-2">
-                <div className="flex gap-1 font-bold text-slate-300">
-                  <span className="font-thin text-black">{`Generated ${dayjs(
+            <Card
+              style={{
+                overflow: "hidden",
+                maxWidth: "400px",
+                margin: "10px auto 0 auto",
+              }}
+            >
+              <CardHeader
+                style={{
+                  padding: 0,
+                  width: "100%",
+                  height: "250px",
+                }}
+              >
+                <Image
+                  src={createdImage.url}
+                  fill
+                  alt={createdImage.prompt}
+                  style={{
+                    objectFit: "cover",
+                  }}
+                />
+              </CardHeader>
+              <CardContent
+                style={{
+                  margin: "1rem 0",
+                  padding: "0 1rem",
+                }}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle>{createdImage.prompt.toUpperCase()}</CardTitle>
+                  <span className="text-xs">{`Generated ${dayjs(
                     createdImage.createdAt
                   ).fromNow()}`}</span>
                 </div>
-                <span className="flex max-h-64 flex-wrap overflow-auto pb-4 pr-2 font-serif text-xl">
-                  {createdImage.prompt}
-                </span>
-                <div className="ml:gap-3 flex h-fit content-end items-end justify-start gap-1 align-bottom">
-                  <Link
-                    href={createdImage.url}
-                    className="text-md flex h-9 items-center justify-center rounded-xl border-b-4 border-violet-900
-                      bg-violet-600 px-4 font-medium text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
+
+                <div className="mt-5 flex h-fit content-end items-end justify-start gap-1 align-bottom">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setImageModalOpen(true)}
                   >
-                    Download
-                  </Link>
-                  <button
-                    className="text-md flex h-9 items-center justify-center rounded-xl border-b-4 border-violet-900
-                      bg-violet-600 px-4 font-medium text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
+                    View
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Link href={createdImage.url}>Download</Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setDeleteModalOpen(true)}
                   >
                     Delete
-                  </button>
+                  </Button>
                   {createdImage.hidden && (
-                    <button
-                      className="text-md flex h-9 items-center justify-center rounded-xl border-b-4 border-violet-900
-                  bg-violet-600 px-4 font-medium text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => mutateShow({ id: createdImage.id })}
                     >
                       <span className="flex lg:hidden">Show</span>
                       <span className="hidden lg:flex">Show on front page</span>
-                    </button>
+                    </Button>
                   )}
                   {!createdImage.hidden && (
-                    <button
-                      className="text-md flex h-9 items-center justify-center rounded-xl border-b-4 border-violet-900
-                  bg-violet-600 px-4 font-medium text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => mutateHide({ id: createdImage.id })}
                     >
                       <span className="flex lg:hidden">Hide</span>
                       <span className="hidden lg:flex">Hide on front page</span>
-                    </button>
+                    </Button>
                   )}
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
             <Transition appear show={deleteModalOpen} as={Fragment}>
               <Dialog
                 as="div"
@@ -438,15 +394,6 @@ const CreateImageWizard = () => {
             </Transition>
           </>
         )}
-        <div className="flex justify-center pt-8">
-          <Link
-            href="/history"
-            className="flex items-center justify-center rounded-xl border-b-4 border-violet-900 bg-violet-600
-            px-2 py-1 text-lg font-semibold text-white duration-300 ease-in hover:scale-105 hover:border-violet-800 hover:bg-violet-600"
-          >
-            Image History
-          </Link>
-        </div>
       </div>
     </div>
   )
@@ -461,11 +408,11 @@ const Generate: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Imager</title>
+        <title>Imagen</title>
       </Head>
       <main className="justify-center">
         <Navbar />
-        <div className="flex border-x border-slate-400 p-4 pt-40 text-black sm:pt-28">
+        <div className="pt-20">
           <CreateImageWizard />
         </div>
       </main>
