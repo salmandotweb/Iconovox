@@ -275,7 +275,7 @@ const Feed = () => {
   if (!data) return <div>Something went wrong</div>
 
   return (
-    <div className="mx-auto flex min-h-screen w-11/12 max-w-screen-xl flex-col content-center justify-center gap-2 md:w-5/6">
+    <div className="mx-auto flex min-h-fit w-11/12 max-w-screen-xl flex-col content-center justify-start gap-2 md:w-5/6">
       <div className="flex items-center justify-between py-4">
         <p className="text-center text-2xl font-semibold sm:text-3xl md:text-4xl">
           Your Collection
@@ -304,9 +304,9 @@ const HistoryPage: NextPage = () => {
       <Head>
         <title>imagen</title>
       </Head>
-      <main className="flex flex-col justify-center text-black">
+      <main className="flex flex-col justify-start text-black">
         <Navbar />
-        <div className="pt-10">
+        <div className="mt-10">
           <Feed />
         </div>
       </main>
